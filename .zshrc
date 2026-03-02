@@ -33,7 +33,7 @@ if [ -f "$HOME/miniconda3/etc/profile.d/conda.sh" ]; then
 fi
 
 # ================================
-# Minimal Prompt (Updated)
+# Minimal Prompt
 # ================================
 autoload -Uz colors && colors
 setopt prompt_subst
@@ -45,8 +45,20 @@ conda_prompt() {
     fi
 }
 
-# The Layout: env_name user_name current_dir
-# %n = username
-# %~ = current directory (with ~ for home)
+# Function to get current git branch
+git_branch() {
+    local branch=$(git branch --show-current 2>/dev/null)
+    if [[ -n "$branch" ]]; then
+        echo " $branch"
+    fi
+}
+
+# Function to show immediate directory name
+current_dir() {
+    basename "$PWD"
+}
+
+# The Layout: env_name current_dir current_branch
+# %F{8} = grey, %F{blue} = blue, %F{magenta} = magenta
 # %# = the prompt character (% or #)
-PROMPT='$(conda_prompt)%F{blue}%n%f %~%f %# '
+PROMPT='$(conda_prompt)%F{blue}$(current_dir)%f%F{magenta}$(git_branch)%f %# '
