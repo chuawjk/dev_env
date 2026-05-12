@@ -19,7 +19,7 @@ ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#666666"
 # ================================
 # Colored output in ls
 # ================================
-alias ls='ls --color=auto'
+alias ls='gls --color=auto'
 
 # ================================
 # Conda Setup (no parentheses)
@@ -31,6 +31,21 @@ export CONDA_CHANGEPS1=false
 if [ -f "$HOME/miniconda3/etc/profile.d/conda.sh" ]; then
     source "$HOME/miniconda3/etc/profile.d/conda.sh"
 fi
+
+# ================================
+# Show active venv
+# ================================
+# Suppress venv's built-in prompt modification
+export VIRTUAL_ENV_DISABLE_PROMPT=1
+
+# Show venv name: use parent dir if venv folder is a dotfile (e.g. .venv)
+venv_prompt() {
+    if [[ -n "$VIRTUAL_ENV" ]]; then
+        local name=$(basename "$VIRTUAL_ENV")
+        [[ "$name" == .* ]] && name=$(basename "$(dirname "$VIRTUAL_ENV")")
+        echo "%F{8}$name%f "
+    fi
+}
 
 # ================================
 # Minimal Prompt
@@ -61,4 +76,4 @@ current_dir() {
 # The Layout: env_name current_dir current_branch
 # %F{8} = grey, %F{blue} = blue, %F{magenta} = magenta
 # %# = the prompt character (% or #)
-PROMPT='$(conda_prompt)%F{blue}$(current_dir)%f%F{magenta}$(git_branch)%f %# '
+PROMPT='$(conda_prompt)$(venv_prompt)%F{blue}$(current_dir)%f%F{magenta}$(git_branch)%f %# '
